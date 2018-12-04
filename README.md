@@ -24,22 +24,22 @@ Plus, if you were serious you'd use asymmetric (public-private) encryption anywa
 
 These scripts use `gpg` to do the heavy lifting.  You should have it installed; if not do:
 
-        # apt install gpg
+        apt install gpg
               or
-        # yum install gpg
+        yum install gpg
 
 
 ## Installation
 
 Copy the files to anyplace in your PATH, /usr/local/bin is recommended.
-Make them executable and owned by root.  That's it.
+Make them executable and owned by root.  That's it.  So, as root do:
 
-        # cp encrypt /usr/local/bin/
-        # cp decrypt /usr/local/bin/
-        # chown root.root /usr/local/bin/encrypt
-        # chown root.root /usr/local/bin/decrypt
-        # chmod 755 /usr/local/bin/encrypt
-        # chmod 755 /usr/local/bin/decrypt
+        cp encrypt /usr/local/bin/
+        cp decrypt /usr/local/bin/
+        chown root.root /usr/local/bin/encrypt
+        chown root.root /usr/local/bin/decrypt
+        chmod 755 /usr/local/bin/encrypt
+        chmod 755 /usr/local/bin/decrypt
 
 ## Why?
 
