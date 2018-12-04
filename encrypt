@@ -29,19 +29,25 @@ usage () {
     echo ""
     echo "Options:"
     echo "    -h | -?    Display this usage help"
+    echo "    -n         Obscure filenames"
     echo "    -p PHRASE  Passphrase - don't use this, it's just for testing!"
     echo "    -v         Verbose mode; give more output"
     exit 0
 }
 
+# make default files be {.??,}* to match all files hidden or not?
+
 pwd=""
+obscure=false
 verbose=false
 OPTIND=1         # Reset in case getopts was used earlier
-while getopts "h?p:v" opt; do
+while getopts "h?np:v" opt; do
     case "$opt" in
     h|\?)
         usage
         exit 0
+        ;;
+    n)  obscure=true
         ;;
     p)  pwd=$OPTARG
         ;;
@@ -77,12 +83,19 @@ do
         echo "*** No such file: $f";
         exit 2
     fi
-    if [[ $f == *".gpg" ]]
-    then
+    if [[ "$f" == *".gpg" ]] ; then
         echo "- already encrypted: $f";
     else
-        echo $pwd | gpg --batch --yes --passphrase-fd 0 -c $f
-        rm $f
+        o="$f.gpg"
+        if $obscure ; then
+            path=$(dirname "$f")    # ${f%/*} fails if no path in name
+            name=$(basename "$f")   # ${f##*/} also works
+            ba64=`echo "$name" | base64 -w0`
+            ba64=${ba64//\//-}      # can't have slashes, make them be dashes
+            o="$path/.:.$ba64.gpg"
+        fi
+        echo "$pwd" | gpg --batch --yes --passphrase-fd 0 -c -o "$o" "$f"
+        rm "$f"
         n=$((n+1))
         $verbose && echo "+ encrypted: $f"
     fi

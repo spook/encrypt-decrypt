@@ -69,18 +69,29 @@ do
         echo "*** No such file: $f";
         exit 2
     fi
-    if [[ $f != *".gpg" ]]
+    if [[ "$f" != *".gpg" ]]
     then
         echo "- already decrypted: $f";
     else
-        out="${f%.*}"
-        echo $pwd | gpg --batch --yes --passphrase-fd 0 --decrypt -o "$out" -q $f
+        o="${f%.*}" # Remove .gpp suffix
+        base=$(basename "$o")   # ${f##*/} also works
+
+        # Check if the name is obfuscated.  We use the prefix .:. to indicate obfuscation
+        if [[ "$base" = ".:."* ]] ; then
+            ba64=${base#.:.}                # Remove .:. prefix from base
+            ba64=${ba64//-/\/}              # Change dashes back to slashes
+            base=`echo $ba64 | base64 -d`   # decode
+            path=$(dirname "$o")            # ${f%/*} fails if no path in name
+            o="$path/$base"
+        fi
+
+        echo "$pwd" | gpg --batch --yes --passphrase-fd 0 --decrypt -o "$o" -q "$f"
         err=$?
         if [ $err -ne 0 ]; then
             echo "*** Decryption failed, aborting: $f"
             exit 126
         fi
-        rm $f
+        rm "$f"
         n=$((n+1))
         $verbose && echo "+ decrypted: $f"
     fi
