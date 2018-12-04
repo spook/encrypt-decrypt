@@ -31,6 +31,26 @@ These scripts use `gpg` to do the heavy lifting.  You should have it installed; 
 If using -n to obscure filenames, you also need the `base64` tool.
 This comes standard with most distros.
 
+## Restrictions
+
+When files are encrypted, the encrypted name is the original name plus a ".gpg" suffix.
+Thus the filename length will grow by 4 characters.  If the filename is larger than
+the NAME_MAX of the filesystem minus 4, then it will not be encrypted -- since the new
+name won't fit. 
+
+On many file systems, NAME_MAX is 255 thus the max filename length for encryption
+is 251 characters long.  On the encryptfs file system, NAME_MAX is typically 143
+so 139 is the limit for this utility.
+
+Similary, if encrypting with the -n (obfuscate filename) option, the obfuscation 
+uses Base64 encoding which adds roughly 33% to the filename length.  Add then
+a special prefix that tags the file as obfuscated, and the ".gpg" suffix.
+So with obfuscation a good estimate is the largest filename is around 60% of
+your file system's NAME_MAX.
+
+Note that if the filename is too long to obfuscate, but less than the maximum for 
+encryption, it will still be encrypted.
+
 ## Installation
 
 Copy the files to anyplace in your PATH, /usr/local/bin is recommended.
