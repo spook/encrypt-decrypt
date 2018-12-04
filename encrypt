@@ -2,7 +2,7 @@
 echo -n 'Passphrase: '
 read -s pwd
 echo
-echo -n 'Confirm: '
+echo -n 'Re-enter: '
 read -s pwd2
 echo
 if [ ! "$pwd" == "$pwd2" ] 
@@ -22,7 +22,7 @@ do
     then
         echo "already encrypted: $f";
     else
-        echo $pwd|gpg --batch --yes --passphrase-fd 0 -c $f
+        echo $pwd | gpg --batch --yes --passphrase-fd 0 -c $f
         rm $f
         n=$((n+1))
     fi

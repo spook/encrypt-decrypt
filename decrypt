@@ -16,7 +16,7 @@ do
     else
         out="${f%.*}"
 #        echo "output name <$out>"
-        echo $pwd|gpg --batch --yes --passphrase-fd 0 --decrypt -o "$out" -q $f
+        echo $pwd | gpg --batch --yes --passphrase-fd 0 --decrypt -o "$out" -q $f
         err=$?
         if [ $err -ne 0 ]; then
             echo "*** Decryption failed, aborting: $f"
