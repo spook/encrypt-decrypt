@@ -1,7 +1,66 @@
 #!/bin/bash
-echo -n 'Passphrase: '
-read -s pwd
-echo
+#   Encrypt & Decrypt Files from the Command Line. 
+#   Simple wrapper scripts to make encryption even easier.
+#   https://github.com/spook/encrypt-decrypt
+#
+#   Copyright (c) 2018 by Uncle Spook
+#
+#   MIT License
+#
+#   Permission is hereby granted, free of charge, to any person obtaining a copy
+#   of this software and associated documentation files (the "Software"), to deal
+#   in the Software without restriction, including without limitation the rights
+#   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#   copies of the Software, and to permit persons to whom the Software is
+#   furnished to do so, subject to the following conditions:
+#   The above copyright notice and this permission notice shall be included in all
+#   copies or substantial portions of the Software.
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#   SOFTWARE.
+
+usage () {
+    echo "Usage: encrypt [options] files..."
+    echo "Encrypt files with a symmetric key (a passphrase)."
+    echo ""
+    echo "Options:"
+    echo "    -h | -?    Display this usage help"
+    echo "    -p PHRASE  Passphrase - don't use this, it's just for testing!"
+    echo "    -v         Verbose mode; give more output"
+    exit 0
+}
+
+pwd=""
+verbose=false
+OPTIND=1         # Reset in case getopts was used earlier
+while getopts "h?p:v" opt; do
+    case "$opt" in
+    h|\?)
+        usage
+        exit 0
+        ;;
+    p)  pwd=$OPTARG
+        ;;
+    v)  verbose=true
+        ;;
+    esac
+done
+shift $((OPTIND-1))
+[ "${1:-}" = "--" ] && shift
+
+if [ -z "$pwd" ] ; then
+    echo -n 'Passphrase: '
+    read -s pwd
+    echo
+fi
+if [ -z "$pwd" ] ; then
+    echo "*** Passphrase must not be empty"
+    exit 22
+fi
 
 n=0
 for f in "$@"
@@ -12,10 +71,9 @@ do
     fi
     if [[ $f != *".gpg" ]]
     then
-        echo "already decrypted: $f";
+        echo "- already decrypted: $f";
     else
         out="${f%.*}"
-#        echo "output name <$out>"
         echo $pwd | gpg --batch --yes --passphrase-fd 0 --decrypt -o "$out" -q $f
         err=$?
         if [ $err -ne 0 ]; then
@@ -24,6 +82,7 @@ do
         fi
         rm $f
         n=$((n+1))
+        $verbose && echo "+ decrypted: $f"
     fi
 done
 echo "$n files decrypted"
