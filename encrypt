@@ -35,8 +35,6 @@ usage () {
     exit 0
 }
 
-# make default files be {.??,}* to match all files hidden or not?
-
 pwd=""
 obscure=false
 verbose=false
@@ -77,6 +75,8 @@ if [ -z "$pwd" ] ; then
 fi
 
 n=0
+shopt -s dotglob nullglob       # Match hidden files and don't give '*' if nothing found
+[[ $# -ge 1 ]] || set -- *      # Default to all files
 for f in "$@"
 do 
     if [ ! -f "$f" ]; then

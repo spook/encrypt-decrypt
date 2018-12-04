@@ -63,6 +63,8 @@ if [ -z "$pwd" ] ; then
 fi
 
 n=0
+shopt -s dotglob nullglob       # Match hidden files and don't give '*' if nothing found
+[[ $# -ge 1 ]] || set -- *      # Default to all files
 for f in "$@"
 do 
     if [ ! -f "$f" ]; then
