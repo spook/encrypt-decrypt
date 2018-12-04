@@ -74,6 +74,7 @@ if [ -z "$pwd" ] ; then
     exit 22
 fi
 
+
 n=0
 shopt -s dotglob nullglob       # Match hidden files and don't give '*' if nothing found
 [[ $# -ge 1 ]] || set -- *      # Default to all files
@@ -91,14 +92,25 @@ do
         echo "- already: $f";
     else
         o="$f.gpg"
-        if $obscure ; then
-            path=$(dirname "$f")    # ${f%/*} fails if no path in name
-            name=$(basename "$f")   # ${f##*/} also works
-            ba64=`echo "$name" | base64 -w0`
-            ba64=${ba64//\//-}      # can't have slashes, make them be dashes
-            o="$path/.:.$ba64.gpg"
+        NAME_MAX=`getconf NAME_MAX "$f"`;           # Varies by mountpoint, so do for each file
+        ENCR_MAX=$(( $NAME_MAX - 4 ))
+        BA64_MAX=$(( $NAME_MAX / 4 * 3 - 7 ))
+        name=$(basename "$f")                       # ${f##*/} also works
+        if [ ${#name} -gt $ENCR_MAX ]; then
+            echo "- cannot encrypt: name too long: $f"
+            continue;
         fi
-        echo "$pwd" | gpg --batch --yes --passphrase-fd 0 -c -o "$o" "$f"
+        if $obscure ; then
+            if [ ${#name} -le $BA64_MAX ] ; then    # Ensure name fits when obfuscated
+                path=$(dirname "$f")                # ${f%/*} fails if no path in name
+                ba64=`echo "$name" | base64 -w0`
+                ba64=${ba64//\//-}                  # can't have slashes, make them be dashes
+                o="$path/.:.$ba64.gpg"
+            else
+                echo "- won't obscure but can encrypt: name too long: $f"
+            fi
+        fi
+        echo "$pwd" | gpg --batch --yes --passphrase-fd 0 -c -o "$o" "$f" || continue;
         rm "$f"
         n=$((n+1))
         $verbose && echo "+ encrypt: $f"

@@ -79,14 +79,14 @@ do
     then
         $verbose && echo "- already: $f";
     else
-        o="${f%.*}" # Remove .gpp suffix
+        o="${f%.*}" # Remove .gpg suffix
         base=$(basename "$o")   # ${f##*/} also works
 
         # Check if the name is obfuscated.  We use the prefix .:. to indicate obfuscation
         if [[ "$base" = ".:."* ]] ; then
             ba64=${base#.:.}                # Remove .:. prefix from base
             ba64=${ba64//-/\/}              # Change dashes back to slashes
-            base=`echo $ba64 | base64 -d`   # decode
+            base=`echo $ba64 | base64 -d`   # deobfuscate
             path=$(dirname "$o")            # ${f%/*} fails if no path in name
             o="$path/$base"
         fi
@@ -99,7 +99,7 @@ do
         fi
         rm "$f"
         n=$((n+1))
-        $verbose && echo "+ decrypt: $f"
+        $verbose && echo "+ decrypt: $o"
     fi
 done
 echo "$n files decrypted"
