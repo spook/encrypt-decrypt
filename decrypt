@@ -1,0 +1,30 @@
+#!/bin/bash
+echo -n 'Passphrase: '
+read -s pwd
+echo
+
+n=0
+for f in "$@"
+do 
+    if [ ! -f "$f" ]; then
+        echo "*** No such file: $f";
+        exit 2
+    fi
+    if [[ $f != *".gpg" ]]
+    then
+        echo "already decrypted: $f";
+    else
+        out="${f%.*}"
+#        echo "output name <$out>"
+        echo $pwd|gpg --batch --yes --passphrase-fd 0 --decrypt -o "$out" -q $f
+        err=$?
+        if [ $err -ne 0 ]; then
+            echo "*** Decryption failed, aborting: $f"
+            exit 126
+        fi
+        rm $f
+        n=$((n+1))
+    fi
+done
+echo "$n files decrypted"
+exit 0

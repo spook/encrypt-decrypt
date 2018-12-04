@@ -1,0 +1,31 @@
+#!/bin/bash
+echo -n 'Passphrase: '
+read -s pwd
+echo
+echo -n 'Confirm: '
+read -s pwd2
+echo
+if [ ! "$pwd" == "$pwd2" ] 
+then
+    echo "*** Mismatch"
+    exit 1
+fi
+
+n=0
+for f in "$@"
+do 
+    if [ ! -f "$f" ]; then
+        echo "*** No such file: $f";
+        exit 2
+    fi
+    if [[ $f == *".gpg" ]]
+    then
+        echo "already encrypted: $f";
+    else
+        echo $pwd|gpg --batch --yes --passphrase-fd 0 -c $f
+        rm $f
+        n=$((n+1))
+    fi
+done
+echo "$n files encrypted"
+exit 0
