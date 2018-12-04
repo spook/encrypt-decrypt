@@ -67,13 +67,17 @@ shopt -s dotglob nullglob       # Match hidden files and don't give '*' if nothi
 [[ $# -ge 1 ]] || set -- *      # Default to all files
 for f in "$@"
 do 
+    if [ -d "$f" ]; then
+        $verbose && echo "- skipdir: $f";
+        continue
+    fi
     if [ ! -f "$f" ]; then
         echo "*** No such file: $f";
         exit 2
     fi
     if [[ "$f" != *".gpg" ]]
     then
-        echo "- already decrypted: $f";
+        $verbose && echo "- already: $f";
     else
         o="${f%.*}" # Remove .gpp suffix
         base=$(basename "$o")   # ${f##*/} also works
@@ -95,7 +99,7 @@ do
         fi
         rm "$f"
         n=$((n+1))
-        $verbose && echo "+ decrypted: $f"
+        $verbose && echo "+ decrypt: $f"
     fi
 done
 echo "$n files decrypted"

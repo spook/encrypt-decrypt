@@ -79,12 +79,16 @@ shopt -s dotglob nullglob       # Match hidden files and don't give '*' if nothi
 [[ $# -ge 1 ]] || set -- *      # Default to all files
 for f in "$@"
 do 
+    if [ -d "$f" ]; then
+        $verbose && echo "- skipdir: $f";
+        continue
+    fi
     if [ ! -f "$f" ]; then
         echo "*** No such file: $f";
         exit 2
     fi
     if [[ "$f" == *".gpg" ]] ; then
-        echo "- already encrypted: $f";
+        echo "- already: $f";
     else
         o="$f.gpg"
         if $obscure ; then
@@ -97,7 +101,7 @@ do
         echo "$pwd" | gpg --batch --yes --passphrase-fd 0 -c -o "$o" "$f"
         rm "$f"
         n=$((n+1))
-        $verbose && echo "+ encrypted: $f"
+        $verbose && echo "+ encrypt: $f"
     fi
 done
 echo "$n files encrypted"
