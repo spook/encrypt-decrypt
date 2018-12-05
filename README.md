@@ -86,7 +86,7 @@ encryption, it will still be encrypted.
 
 ## Installation
 
-Copy the files to anyplace in your PATH, /usr/local/bin is recommended.
+Copy the 'encrypt' and 'decrypt' files to anyplace in your PATH; /usr/local/bin is recommended.
 Make them executable and owned by root.  That's it.  So, as root do:
 
         cp encrypt /usr/local/bin/
