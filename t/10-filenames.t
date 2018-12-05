@@ -14,7 +14,7 @@ my $DECRYPT = abs_path "$MYDIR/../decrypt";
 
 # Determine maximum file name and path lengths
 my $NAME_MAX = qx(getconf NAME_MAX $TESTDIR);
-my $PATH_MAX = qx(getconf NAME_MAX $TESTDIR);
+my $PATH_MAX = qx(getconf PATH_MAX $TESTDIR);
 chomp $NAME_MAX;
 chomp $PATH_MAX;
 my $BA64_MAX = int($NAME_MAX/4)*3 - length(".:.") - length(".gpg"); # Maximum that can be base64-encoded
@@ -49,9 +49,9 @@ is $?, 0, "Exit status";
 like $out, qr/^12 files encrypted/m, "Encrypted top-level files";
 like $out, qr/cannot encrypt: name too long: Max-name-3/m, "too long to encrypt at max";
 like $out, qr/cannot encrypt: name too long: Max-name:/m,  "too long to encrypt at -3";
-like $out, qr/won\'t obscure but can encrypt\: name too long\: Max-base64\+1\:/m, "can't obscure +1";
-like $out, qr/won\'t obscure but can encrypt\: name too long\: Max-base64\+2\:/m, "can't obscure +2";
-like $out, qr/won\'t obscure but can encrypt\: name too long\: Max-name-4/m,      "can't obscure max-4";
+like $out, qr/cannot obscure\: name too long\: Max-base64\+1\:/m, "can't obscure +1";
+like $out, qr/cannot obscure\: name too long\: Max-base64\+2\:/m, "can't obscure +2";
+like $out, qr/cannot obscure\: name too long\: Max-name-4/m,      "can't obscure max-4";
 like $out, qr/skipdir:  dir with  blanks  $/m,        "skipdir 1";
 like $out, qr/skipdir: . hidden dir and  blanks  $/m, "skipdir 2";
 like $out, qr/skipdir: .hiddendir-c$/m,               "skipdir 3";

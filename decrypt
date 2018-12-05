@@ -35,20 +35,24 @@ usage () {
     echo "Options:"
     echo "    -h | -?    Display this usage help"
     echo "    -p PHRASE  Passphrase - don't use this, it's just for testing!"
+    echo "    -t         Test mode, show what would be done but don't do it"
     echo "    -v         Verbose mode; give more output"
     exit 0
 }
 
 pwd=""
+testmode=false
 verbose=false
 OPTIND=1         # Reset in case getopts was used earlier
-while getopts "h?p:v" opt; do
+while getopts "h?p:tv" opt; do
     case "$opt" in
     h|\?)
         usage
         exit 0
         ;;
     p)  pwd=$OPTARG
+        ;;
+    t)  testmode=true
         ;;
     v)  verbose=true
         ;;
@@ -88,13 +92,16 @@ do
         base=$(basename "$o")   # ${f##*/} also works
 
         # Check if the name is obfuscated.  We use the prefix .:. to indicate obfuscation
+        what="decrypt"
         if [[ "$base" = ".:."* ]] ; then
             ba64=${base#.:.}                # Remove .:. prefix from base
             ba64=${ba64//-/\/}              # Change dashes back to slashes
             base=`echo $ba64 | base64 -d`   # deobfuscate
             path=$(dirname "$o")            # ${f%/*} fails if no path in name
             o="$path/$base"
+            what="dcr/obs"
         fi
+        $testmode && echo "- would $what: $o" && continue
 
         echo "$pwd" | gpg --batch --yes --passphrase-fd 0 --decrypt -o "$o" -q "$f"
         err=$?

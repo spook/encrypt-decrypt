@@ -36,15 +36,17 @@ usage () {
     echo "    -h | -?    Display this usage help"
     echo "    -n         Obscure filenames"
     echo "    -p PHRASE  Passphrase - don't use this, it's just for testing!"
+    echo "    -t         Test mode, show what would be done but don't do it"
     echo "    -v         Verbose mode; give more output"
     exit 0
 }
 
 pwd=""
 obscure=false
+testmode=false
 verbose=false
 OPTIND=1         # Reset in case getopts was used earlier
-while getopts "h?np:v" opt; do
+while getopts "h?np:tv" opt; do
     case "$opt" in
     h|\?)
         usage
@@ -53,6 +55,8 @@ while getopts "h?np:v" opt; do
     n)  obscure=true
         ;;
     p)  pwd=$OPTARG
+        ;;
+    t)  testmode=true
         ;;
     v)  verbose=true
         ;;
@@ -105,16 +109,19 @@ do
             echo "- cannot encrypt: name too long: $f"
             continue;
         fi
+        what="encrypt"
         if $obscure ; then
             if [ ${#name} -le $BA64_MAX ] ; then    # Ensure name fits when obfuscated
                 path=$(dirname "$f")                # ${f%/*} fails if no path in name
                 ba64=`echo "$name" | base64 -w0`
                 ba64=${ba64//\//-}                  # can't have slashes, make them be dashes
                 o="$path/.:.$ba64.gpg"
+                what="enc/obs"
             else
-                echo "- won't obscure but can encrypt: name too long: $f"
+                echo "- cannot obscure: name too long: $f"
             fi
         fi
+        $testmode && echo "- would $what: $f" && continue
         echo "$pwd" | gpg --batch --yes --passphrase-fd 0 -c -o "$o" "$f" || continue;
         rm "$f"
         n=$((n+1))
