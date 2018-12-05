@@ -1,5 +1,6 @@
 #!/bin/bash
 #   Encrypt & Decrypt Files from the Command Line. 
+#   Includes filename de-obfuscation.
 #   Simple wrapper scripts to make encryption even easier.
 #   https://github.com/spook/encrypt-decrypt
 #
@@ -24,8 +25,12 @@
 #   SOFTWARE.
 
 usage () {
-    echo "Usage: encrypt [options] files..."
-    echo "Encrypt files with a symmetric key (a passphrase)."
+    echo "Usage: decrypt [options] FILES..."
+    echo ""
+    echo "Decrypt files that were encrypted with a symmetric key (a passphrase)."
+    echo "Will de-obscure filenames if they were obscured."
+    echo "If FILES are omitted, it will try to decrypte all files in the current"
+    echo "directory, including hidden files."
     echo ""
     echo "Options:"
     echo "    -h | -?    Display this usage help"

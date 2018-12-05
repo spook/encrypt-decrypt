@@ -1,13 +1,13 @@
 # encrypt-decrypt
-Encrypt &amp; Decrypt Files from the Command Line.
+Encrypt &amp; decrypt files from the command line.
 Includes filename obfuscation.
 These are simple wrapper scripts to make your encryption even easier.
 
 ## Caution!
 
 This is for casual encryption.  Don't use these scripts for anything serious!
-They're just little wrappers around the 'gpg' command.
-Plus, if you were serious you'd use asymmetric (public-private) encryption anyway.
+They're just little wrappers around the 'gpg' and 'base64' commands.
+If you were serious you'd use asymmetric (public-private) encryption, anyway!
 
 ## Synopsys
 
@@ -20,6 +20,38 @@ Plus, if you were serious you'd use asymmetric (public-private) encryption anywa
         Passphrase: xxxx
         123 files decrypted
 
+## Usage
+
+Get usage with the help (-h or -?) option.
+
+### encrypt Command
+
+        Usage: encrypt [options] FILES...
+
+        Encrypt files with a symmetric key (a passphrase).
+        Can optionally obscure the filenames.
+        If FILES are omitted, tries to encrypt all the files in the current,
+        directory, including hidden files.
+
+        Options:
+            -h | -?    Display this usage help
+            -n         Obscure filenames
+            -p PHRASE  Passphrase - don't use this, it's just for testing!
+            -v         Verbose mode; give more output
+
+### decrypt Command
+
+        Usage: decrypt [options] FILES...
+
+        Decrypt files that were encrypted with a symmetric key (a passphrase).
+        Will de-obscure filenames if they were obscured.
+        If FILES are omitted, it will try to decrypte all files in the current
+        directory, including hidden files.
+
+        Options:
+            -h | -?    Display this usage help
+            -p PHRASE  Passphrase - don't use this, it's just for testing!
+            -v         Verbose mode; give more output
 
 ## Prerequisites
 
@@ -30,7 +62,7 @@ These scripts use `gpg` to do the heavy lifting.  You should have it installed; 
         yum install gpg
 
 If using -n to obscure filenames, you also need the `base64` tool.
-This comes standard with most distros.
+This comes standard with most distros, typically in the `coreutils` package.
 
 ## Restrictions
 
