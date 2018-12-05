@@ -1,6 +1,7 @@
 # encrypt-decrypt
 Encrypt &amp; Decrypt Files from the Command Line.
-Simple wrapper scripts to make encryption even easier.
+Includes filename obfuscation.
+These are simple wrapper scripts to make your encryption even easier.
 
 ## Caution!
 
