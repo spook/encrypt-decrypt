@@ -4,7 +4,7 @@ use Cwd qw/abs_path/;
 use File::Basename;
 use Test::More;
 
-plan tests => 45;
+plan tests => 37;
 my $TESTDIR = "./test-tmp";
 BAIL_OUT "Cannot create test directory: $!"
     if !-d $TESTDIR && !mkdir $TESTDIR;
@@ -52,10 +52,10 @@ like $out, qr/cannot encrypt: name too long: Max-name:/m,  "too long to encrypt 
 like $out, qr/cannot obscure\: name too long\: Max-base64\+1\:/m, "can't obscure +1";
 like $out, qr/cannot obscure\: name too long\: Max-base64\+2\:/m, "can't obscure +2";
 like $out, qr/cannot obscure\: name too long\: Max-name-4/m,      "can't obscure max-4";
-like $out, qr/skipdir:  dir with  blanks  $/m,        "skipdir 1";
-like $out, qr/skipdir: . hidden dir and  blanks  $/m, "skipdir 2";
-like $out, qr/skipdir: .hiddendir-c$/m,               "skipdir 3";
-like $out, qr/skipdir: subdir-a$/m,                   "skipdir 4";
+#like $out, qr/skipdir:  dir with  blanks  $/m,        "skipdir 1";
+#like $out, qr/skipdir: . hidden dir and  blanks  $/m, "skipdir 2";
+#like $out, qr/skipdir: .hiddendir-c$/m,               "skipdir 3";
+#like $out, qr/skipdir: subdir-a$/m,                   "skipdir 4";
 
 my $n = 0;
 my $files = qx(ls -1a "$TESTDIR");
@@ -99,14 +99,14 @@ is $?, 0, "Exit status";
 $n = 0;
 like $out, qr{^12 files decrypted}m, 
     "Decrypted top-level files";
-like $out, qr{^\- skipdir\:  dir with  blanks  }m,
-    "skipdir ". (++$n);
-like $out, qr{^\- skipdir\: . hidden dir and  blanks  }m,
-    "skipdir ". (++$n);
-like $out, qr{^\- skipdir\: .hiddendir-c}m,
-    "skipdir ". (++$n);
-like $out, qr{^\- skipdir\: subdir-a}m,
-    "skipdir ". (++$n);
+#like $out, qr{^\- skipdir\:  dir with  blanks  }m,
+#    "skipdir ". (++$n);
+#like $out, qr{^\- skipdir\: . hidden dir and  blanks  }m,
+#    "skipdir ". (++$n);
+#like $out, qr{^\- skipdir\: .hiddendir-c}m,
+#    "skipdir ". (++$n);
+#like $out, qr{^\- skipdir\: subdir-a}m,
+#    "skipdir ". (++$n);
 like $out, qr{^\- already\: Max-name-3YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY}m,
     "already ". (++$n);
 like $out, qr{^\- already\: Max-name: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}m,
