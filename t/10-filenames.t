@@ -8,7 +8,7 @@ plan tests => 45;
 my $TESTDIR = "./test-tmp";
 BAIL_OUT "Cannot create test directory: $!"
     if !-d $TESTDIR && !mkdir $TESTDIR;
-my $MYDIR = dirname(__FILE__);    # Path to this script, which is in t/
+my $MYDIR   = dirname(__FILE__);        # Path to this script, which is in t/ usually
 my $ENCRYPT = abs_path "$MYDIR/../encrypt";
 my $DECRYPT = abs_path "$MYDIR/../decrypt";
 
