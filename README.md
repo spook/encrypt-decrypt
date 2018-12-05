@@ -1,7 +1,31 @@
 # encrypt-decrypt
 Encrypt &amp; decrypt files from the command line.
-Includes filename obfuscation.
+
+## Description
 These are simple wrapper scripts to make your encryption even easier.
+Two scripts are provided: 'encrypt' and 'decrypt'.
+Use 'encrypt' to encrypt the contents of files and optionally obfuscate the filename.
+Use 'decrypt' to de-obfuscate filenames and recover the contents of the file.
+
+These scripts work on individual files or directories of files.
+If given a directory, they will operate on all files in that directory.
+With the recurse (-r) option, they will descend into all subdirectories
+and do those files too.
+
+When encrypting, use the obfuscate names (-n) option to hide the files
+and rename them to random-looking names.  (It's actually a base64
+encoding of the filename).
+
+Use the test (-t) option to see what files would be processed, without
+actually affecting the files.
+
+Use the verbose (-v) option to see filenames as they're operated upon.
+
+The passphrase may be provided on the command line with the -p option,
+but THIS IS DANGEROUS!  Your command history will keep the passphrase
+for attackers to find, and process listings on the system will show
+this passphrase.  So please don't use it unless you really know what you
+are doing.  You have been warned!
 
 ## Caution!
 
@@ -11,12 +35,12 @@ If you were serious you'd use asymmetric (public-private) encryption, anyway!
 
 ## Synopsys
 
-        $ encrypt path/to/files/*
+        $ encrypt path/to/files/
         Passphrase: xxxx
         Re-enter: xxxx
         123 files encrypted
 
-        $ decrypt path/to/files/*
+        $ decrypt path/to/files/
         Passphrase: xxxx
         123 files decrypted
 
@@ -37,6 +61,8 @@ Get usage with the help (-h or -?) option.
             -h | -?    Display this usage help
             -n         Obscure filenames
             -p PHRASE  Passphrase - don't use this, it's just for testing!
+            -r         Recurse into subdirectories
+            -t         Test mode, show what would be done but don't do it"
             -v         Verbose mode; give more output
 
 ### decrypt Command
@@ -51,16 +77,20 @@ Get usage with the help (-h or -?) option.
         Options:
             -h | -?    Display this usage help
             -p PHRASE  Passphrase - don't use this, it's just for testing!
+            -r         Recurse into subdirectories
+            -t         Test mode, show what would be done but don't do it"
             -v         Verbose mode; give more output
 
 ## Prerequisites
 
+When the scripts run they check their prerequisites and will complain if any are missing.
 These scripts use `gpg` to do the heavy lifting.  You should have it installed; if not do:
 
         apt install gpg
               or
         yum install gpg
 
+The 'realpath' utility is also used; please install it if needed.
 If using -n to obscure filenames, you also need the `base64` tool.
 This comes standard with most distros, typically in the `coreutils` package.
 

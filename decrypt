@@ -35,22 +35,27 @@ usage () {
     echo "Options:"
     echo "    -h | -?    Display this usage help"
     echo "    -p PHRASE  Passphrase - don't use this, it's just for testing!"
+    echo "    -r         Recurse into subdirectories"
     echo "    -t         Test mode, show what would be done but don't do it"
     echo "    -v         Verbose mode; give more output"
     exit 0
 }
 
+# Parse command options
 pwd=""
+recurse=false
 testmode=false
 verbose=false
 OPTIND=1         # Reset in case getopts was used earlier
-while getopts "h?p:tv" opt; do
+while getopts "h?p:rtv" opt; do
     case "$opt" in
     h|\?)
         usage
         exit 0
         ;;
     p)  pwd=$OPTARG
+        ;;
+    r)  recurse=true
         ;;
     t)  testmode=true
         ;;
@@ -61,6 +66,22 @@ done
 shift $((OPTIND-1))
 [ "${1:-}" = "--" ] && shift
 
+# Check dependencies
+if ! command -v base64 1>/dev/null; then
+    echo "*** base64 tool is missing, please install it (coreutils package?)"
+    exit 65 # ENOPKG package not installed
+fi
+if ! command -v gpg 1>/dev/null; then
+    echo "*** gpg tool is missing, please install it (gpg package?)"
+    exit 65 # ENOPKG package not installed
+fi
+if ! command -v realpath 1>/dev/null; then
+    echo "*** realpath tool is missing, please install it (coreutils package?)"
+    exit 65 # ENOPKG package not installed
+fi
+
+
+# Get passphrase
 if [ -z "$pwd" ] ; then
     echo -n 'Passphrase: '
     read -s pwd
@@ -71,11 +92,39 @@ if [ -z "$pwd" ] ; then
     exit 22
 fi
 
-n=0
+# Build the list of files
 shopt -s dotglob nullglob       # Match hidden files and don't give '*' if nothing found
-[[ $# -ge 1 ]] || set -- *      # Default to all files
-for f in "$@"
-do 
+[[ $# -ge 1 ]] || set -- `pwd`  # Default to "here"
+#ignore="(^|\/)\.\.?$"   # skip . .. /. /.. blah/. blah/.. and so on, but not ... nor blah/a.
+files=()    # Start empty
+for path in "$@"; do 
+#    if [[ "$path" =~ $ignore ]]; then
+#        continue;
+#    fi
+
+    # Because we handle filenames with spaces in them, 
+    #  we do a trick where we pump the list of filenames, 
+    #  delimited by \0, into `read` which can use the \0 
+    #  as a delimiter.  This lets us build up the shell array
+    #  with filenames that contain spaces and other weird characters.
+    while IFS=  read -r -d $'\0' FILE; do
+        FILE=`realpath --relative-base=. "$FILE"`
+        files+=("$FILE")
+    done < <(find "$path" $maxdepth -type f -print0)
+done
+
+# Sort and eliminate duplicates 
+#   We use the \0 technique, like above, so we don't split files with blanks in names
+sorted=()
+while IFS=  read -r -d $'\0' FILE; do
+    sorted+=("$FILE")
+done < <(printf "%s\0" "${files[@]}" | sort -uz)
+
+# Process each file
+typeset -i i n  # be more efficient
+n=0
+for (( i=0; i<${#sorted[@]}; ++i )); do
+    f="${sorted[$i]}"
     if [ -d "$f" ]; then
         $verbose && echo "- skipdir: $f";
         continue
