@@ -75,8 +75,8 @@ if ! command -v gpg 1>/dev/null; then
     echo "*** gpg tool is missing, please install it (gpg package?)"
     exit 65 # ENOPKG package not installed
 fi
-if ! command -v realpath 1>/dev/null; then
-    echo "*** realpath tool is missing, please install it (coreutils package?)"
+if ! command -v readlink 1>/dev/null; then
+    echo "*** readlink tool is missing, please install it (coreutils package?)"
     exit 65 # ENOPKG package not installed
 fi
 
@@ -97,6 +97,7 @@ shopt -s dotglob nullglob       # Match hidden files and don't give '*' if nothi
 [[ $# -ge 1 ]] || set -- `pwd`  # Default to "here"
 #ignore="(^|\/)\.\.?$"   # skip . .. /. /.. blah/. blah/.. and so on, but not ... nor blah/a.
 files=()    # Start empty
+BASE=`readlink -e .`/
 for path in "$@"; do 
 #    if [[ "$path" =~ $ignore ]]; then
 #        continue;
@@ -108,8 +109,9 @@ for path in "$@"; do
     #  as a delimiter.  This lets us build up the shell array
     #  with filenames that contain spaces and other weird characters.
     while IFS=  read -r -d $'\0' FILE; do
-        FILE=`realpath --relative-base=. "$FILE"`
-        files+=("$FILE")
+        FILE=`readlink -e "$FILE"`
+        CHOP=${FILE/$BASE/}
+        files+=("$CHOP")
     done < <(find "$path" $maxdepth -type f -print0)
 done
 

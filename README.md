@@ -90,7 +90,7 @@ These scripts use `gpg` to do the heavy lifting.  You should have it installed; 
               or
         yum install gpg
 
-The 'realpath' utility is also used; please install it if needed.
+The 'readlink' utility is also used; please install it if needed.
 If using -n to obscure filenames, you also need the `base64` tool.
 This comes standard with most distros, typically in the `coreutils` package.
 
